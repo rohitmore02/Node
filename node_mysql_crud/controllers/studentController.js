@@ -95,4 +95,62 @@ const createStudent = async (req, res) => {
     }
 };
 
-module.exports = { getStudents, getStudentByID, createStudent };
+// UPDATE STUDENT
+const updateStudent = async (req, res) => {
+    try {
+        const studentId = req.params.id;
+        if (!studentId) {
+            return res.status(404).send({
+                success: false,
+                message: 'Invalid id or provide id',
+            })
+        }
+        console.log(req)
+        const { name, roll_no, class: className, medium, fees } = req.body;
+        const data = await db.query(`UPDATE students SET name = ?, roll_no = ?, class = ?, medium = ?, fees = ? WHERE id = ? `, [name, roll_no, className, medium, fees, studentId]);
+        if (!data) {
+            return res.status(500).send({
+                success: false,
+                message: 'Error in Update Data'
+            })
+        }
+        res.status(200).send({
+            success: true,
+            message: 'Student Details Updated'
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            success: false,
+            message: 'Error in Update Student API',
+            error
+        })
+    }
+};
+
+// DELETE STUDENT
+const deleteStudent = async (req, res) => {
+    try {
+        const studentId = req.params.id;
+        if (!studentId) {
+            res.status(500).send({
+                success: false,
+                message: 'Please enter valid id'
+            });
+        }
+
+        await db.query(`DELETE FROM students WHERE id = ?`, [studentId]);
+        res.status(200).send({
+            success: true,
+            message: 'Student deleted successfully'
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            success: false,
+            message: 'Error in Delete student API'
+        })
+    }
+};
+
+module.exports = { getStudents, getStudentByID, createStudent, updateStudent, deleteStudent };
